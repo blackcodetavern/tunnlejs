@@ -31,8 +31,8 @@ var tunnlejs = (function () {
                     config.outerSurface[h+1] * config.radius*Math.cos(getCircleArgument(resolution, i))
                 ); 
 
-                triangles.push(simplelinearalgebra.createTriangle(v1,v2,v3));
-                triangles.push(simplelinearalgebra.createTriangle(v3,v4,v1));
+                triangles.push(simplelinearalgebra.createTriangle(v1,v3,v2));
+                triangles.push(simplelinearalgebra.createTriangle(v3,v1,v4));
             }
         }
         var obj = simplelinearalgebra.createObject(triangles);
@@ -49,7 +49,7 @@ var tunnlejs = (function () {
         // 1.Step flat tunnle: wall1 = undefined
         var outerSurface = [];
         for(var i = 0;i<30;i++) {
-            outerSurface.push(Math.round(85+Math.random()*15)/100)
+            outerSurface.push(Math.round(85+Math.sin(Math.PI/3*i)*15)/100)
         }
 
         var config = {

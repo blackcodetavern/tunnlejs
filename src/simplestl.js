@@ -8,7 +8,7 @@ var simplestl = (function () {
             var cp2 = obj.arrayOfTriangles[i].vertices.v2;
             var cp3 = obj.arrayOfTriangles[i].vertices.v3;
             var norm = obj.arrayOfTriangles[i].norm;
-            result += `facet normal ${Math.round(norm.x*100)/100} ${Math.round(norm.z*100)/100} ${Math.round(norm.y*100)/100}
+            result += `facet normal ${-Math.round(norm.x*100)/100} ${-Math.round(norm.z*100)/100} ${-Math.round(norm.y*100)/100}
                 outer loop
                 vertex ${Math.round(cp1.x*100)/100} ${Math.round(cp1.z*100)/100} ${Math.round(cp1.y*100)/100}
                 vertex ${Math.round(cp2.x*100)/100} ${Math.round(cp2.z*100)/100} ${Math.round(cp2.y*100)/100}
