@@ -14,7 +14,7 @@ var simple3dloader = (function () {
         camera.up.set( 0, 0, 1 );
         camera.position.set( 0, -9, 6 );
 
-        camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
+        camera.add( new THREE.PointLight( 0xffaaaa, 1 ) );
 
         scene.add( camera );
 
@@ -23,7 +23,7 @@ var simple3dloader = (function () {
         scene.add( grid );
 
         renderer = new THREE.WebGLRenderer( { antialias: true, canvas:canvas } );
-        renderer.setClearColor( 0xffffff );
+        renderer.setClearColor( 0x333333 );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( 500, 500 );
         document.body.appendChild( renderer.domElement );

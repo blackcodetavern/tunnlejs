@@ -8,8 +8,7 @@ The first version of this library will use a 1-dimensional array which configure
 a parameter for the tickness and the length of the tunnle.
 
 After that there will be two 1-dimensional arrays for defining an inner and an outer wall. To enable for
-example a flat outer surface and a curvy inner surface. The thichness will be redundant when you create the
-tunnle this way.
+example a flat outer surface and a curvy inner surface.
 
 After that there will follow an array of 3-dimensional vector-coordinates which will define the tunnles
 form. For example to make a torus or a curved pipe 
@@ -22,4 +21,8 @@ Tunnles will also be very important on the moon to connect the different settlem
 
 
 # ToDo
-- Generate a flat pipe in STL
+[x] Flat pipe
+[x] Inside and outside wall definable
+[ ] Define pipes shape
+[ ] Connection elements
+

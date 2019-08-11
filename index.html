@@ -19,13 +19,8 @@
 <body>
     <script>
         setTimeout(function () {
-            //document.getElementById("example1").innerHTML = tunnlejs.createFlatTunnle(100,10,50);
             simple3dloader.init();
-            simple3dloader.setMesh(tunnlejs.createFlatTunnle(100,20,10));
-            setInterval(function () {
-                simple3dloader.setMesh(tunnlejs.createFlatTunnle(100,20,10));
-            },5000)
-            
+            simple3dloader.setMesh(tunnlejs.createFlatTunnle(200,30,0.1,15,50));
         },100);
     </script>
 </body>
