@@ -22,7 +22,10 @@ Tunnles will also be very important on the moon to connect the different settlem
 
 # ToDo
 [x] Flat pipe
+
 [x] Inside and outside wall definable
+
 [ ] Define pipes shape
+
 [ ] Connection elements
 
