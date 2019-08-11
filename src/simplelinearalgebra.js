@@ -5,7 +5,7 @@ var simplelinearalgebra = (function () {
     }
 
     //{vertices:{v1,v2,v3}, norm: vn}
-    var createTriangle = function (v1, v2, v3) {
+    var createTriangle = function (v1, v2, v3, direction) {
         var norm = createNormalVector(v1,v2,v3);
         return {vertices:{v1:v1,v2:v2,v3:v3}, norm:norm};
     }
@@ -25,7 +25,7 @@ var simplelinearalgebra = (function () {
         //normalize
         var length = Math.sqrt(cv.x*cv.x + cv.y*cv.y + cv.z*cv.z);
 
-        return {x:cv.x/length,y:cv.y/length,z:cv.z/length};
+        return {x:-cv.x/length,y:-cv.y/length,z:-cv.z/length};
     }
 
     //{arrayOfTriangles: [v1,...,vn]}

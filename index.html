@@ -5,9 +5,14 @@
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <title>tunnle.js examples</title>
 
+<script src="lib/stlviewer/three.js"></script>
+<script src="lib/stlviewer/STLLoader.js"></script>
+<script src="lib/stlviewer/OrbitControls.js"></script>
+
 <script src="src/simplestl.js"></script>
 <script src="src/simplelinearalgebra.js"></script>
 <script src="src/tunnle.js"></script>
+<script src="src/simple3dloader.js"></script>
 
 </head>
 
@@ -15,15 +20,14 @@
     <script>
         setTimeout(function () {
             //document.getElementById("example1").innerHTML = tunnlejs.createFlatTunnle(100,10,50);
-        
+            simple3dloader.init();
+            simple3dloader.setMesh(tunnlejs.createFlatTunnle(100,20,10));
+            setInterval(function () {
+                simple3dloader.setMesh(tunnlejs.createFlatTunnle(100,20,10));
+            },5000)
             
         },100);
     </script>
-    <script src="lib/stlviewer/three.js"></script>
-    <script src="lib/stlviewer/STLLoader.js"></script>
-    <script src="lib/stlviewer/Detector.js"></script>
-    <script src="lib/stlviewer/OrbitControls.js"></script>
-    <script src="lib/stlviewer/handLoader.js"></script>
 </body>
 
 </html>

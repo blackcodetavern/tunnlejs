@@ -2,42 +2,54 @@ var tunnlejs = (function () {
 
     var createTunnle = function (config) {
         //var flatConfig = {outerSurface:[-1,-1], thickness:1, length: 15,resolution:10};
-        var resolution = config.resolution;
+        var trianglesOuter = createWall(config.outerSurface, config.height, config.radius, config.resolution, -1)
+        var trianglesInner = createWall(config.outerSurface, config.height, config.radius*0.75, config.resolution, 1)
+
+        
+        var obj = simplelinearalgebra.createObject(trianglesOuter.concat(trianglesInner));
+
+        return simplestl.getFullTextSTL(obj);
+    }
+
+    var createWall = function (surface, height, radius, resolution, direction) {
         var triangles = [];
-        for(var h=0;h<config.outerSurface.length-1;h++){
+        for(var h=0;h<surface.length-1;h++){
             for(var i = 1;i<=resolution;i++) {
                 
                 var v1 = simplelinearalgebra.createVertex(
-                    config.outerSurface[h] * config.radius*Math.sin(getCircleArgument(resolution, i)),
-                    config.height*h/config.outerSurface.length,
-                    config.outerSurface[h] * config.radius*Math.cos(getCircleArgument(resolution, i))
+                    surface[h] * radius*Math.sin(getCircleArgument(resolution, i)),
+                    height*h/surface.length,
+                    surface[h] * radius*Math.cos(getCircleArgument(resolution, i))
                 );
 
                 var v2 = simplelinearalgebra.createVertex(
-                    config.outerSurface[h] * config.radius*Math.sin(getCircleArgument(resolution, i+1)),
-                    config.height*h/config.outerSurface.length,
-                    config.outerSurface[h] * config.radius*Math.cos(getCircleArgument(resolution, i+1))
+                    surface[h] * radius*Math.sin(getCircleArgument(resolution, i+1)),
+                    height*h/surface.length,
+                    surface[h] * radius*Math.cos(getCircleArgument(resolution, i+1))
                 ); 
 
                 var v3 = simplelinearalgebra.createVertex(
-                    config.outerSurface[h+1] * config.radius*Math.sin(getCircleArgument(resolution, i+1)),
-                    config.height*(h+1)/config.outerSurface.length,
-                    config.outerSurface[h+1] * config.radius*Math.cos(getCircleArgument(resolution, i+1))
+                    surface[h+1] * radius*Math.sin(getCircleArgument(resolution, i+1)),
+                    height*(h+1)/surface.length,
+                    surface[h+1] * radius*Math.cos(getCircleArgument(resolution, i+1))
                 ); 
                 
                 var v4 = simplelinearalgebra.createVertex(
-                    config.outerSurface[h+1] * config.radius*Math.sin(getCircleArgument(resolution, i)),
-                    config.height*(h+1)/config.outerSurface.length,
-                    config.outerSurface[h+1] * config.radius*Math.cos(getCircleArgument(resolution, i))
+                    surface[h+1] * radius*Math.sin(getCircleArgument(resolution, i)),
+                    height*(h+1)/surface.length,
+                    surface[h+1] * radius*Math.cos(getCircleArgument(resolution, i))
                 ); 
-
-                triangles.push(simplelinearalgebra.createTriangle(v1,v3,v2));
-                triangles.push(simplelinearalgebra.createTriangle(v3,v1,v4));
+                
+                if(direction < 0) {
+                    triangles.push(simplelinearalgebra.createTriangle(v1,v3,v2));
+                    triangles.push(simplelinearalgebra.createTriangle(v3,v1,v4));
+                } else {
+                    triangles.push(simplelinearalgebra.createTriangle(v1,v2,v3));
+                    triangles.push(simplelinearalgebra.createTriangle(v3,v4,v1));
+                }
             }
         }
-        var obj = simplelinearalgebra.createObject(triangles);
-
-        return simplestl.getFullTextSTL(obj);
+        return triangles;
     }
 
     var getCircleArgument = function(resolution, step) {
@@ -48,8 +60,8 @@ var tunnlejs = (function () {
     var createFlatTunnle = function (height,radius,resolution) {
         // 1.Step flat tunnle: wall1 = undefined
         var outerSurface = [];
-        for(var i = 0;i<30;i++) {
-            outerSurface.push(Math.round(85+Math.sin(Math.PI/3*i)*15)/100)
+        for(var i = 0;i<100;i++) {
+            outerSurface.push(Math.round(80+Math.random()*20)/100)
         }
 
         var config = {
