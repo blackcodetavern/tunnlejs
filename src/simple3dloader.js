@@ -1,4 +1,4 @@
-var simple3dloader = (function () {
+function simple3dloader() {
     var camera, scene, renderer, mesh;
     var loader = new THREE.STLLoader();
     var material = new THREE.MeshPhongMaterial( { color: 0x027be3, specular: 0x000000, shininess: 10 } );
@@ -12,13 +12,13 @@ var simple3dloader = (function () {
         // Z is up for objects intended to be 3D printed.
 
         camera.up.set( 0, 0, 1 );
-        camera.position.set( 0, -9, 6 );
+        camera.position.set( 0, -9, 3 );
 
         camera.add( new THREE.PointLight( 0xffaaaa, 1 ) );
 
         scene.add( camera );
 
-        var grid = new THREE.GridHelper( 25, 50, 0xff0000, 0x555555 );
+        var grid = new THREE.GridHelper( 10, 50, 0xff0000, 0x555555 );
         grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
         scene.add( grid );
 
@@ -59,8 +59,13 @@ var simple3dloader = (function () {
         renderer.render( scene, camera );
     }
 
+    function getCanvas() {
+        return renderer.domElement;
+    }
+
     return {
         init,
-        setMesh
+        setMesh,
+        getCanvas
     }
-})();
+};

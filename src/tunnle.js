@@ -1,20 +1,24 @@
 var tunnlejs = (function () {
 
     var createTunnle = function (config) {
-        //var flatConfig = {outerSurface:[-1,-1], thickness:1, length: 15,resolution:10};
+        //Outer and inner wall of the tunnle
         var outer = createWall(config.outerSurface, config.height, config.radius, config.resolution, -1)
-        var inner = createWall(config.innerSurface, config.height, config.radius*0.75, config.resolution, 1)
+        var inner = createWall(config.innerSurface, config.height, config.radius*(1-config.thickness), config.resolution, 1)
 
+        //Top and bottom closure (Will be extended in a future release)
         var closure = createClosure(outer.closureVertices, inner.closureVertices);
         
+        //Concat the triangles of the tunnle
         var obj = simplelinearalgebra.createObject(outer.triangles.concat(inner.triangles).concat(closure));
 
+        //Generate the STL from the triangles
         return simplestl.getFullTextSTL(obj);
     }
 
     var createClosure = function (outerVertices, innerVertices) {
         var triangles = [];        
         for(var i = 0;i<outerVertices.length/2;i++) {
+            //Bottom closure
             var v1 = outerVertices[i];
             var v2 = outerVertices[(i+1) % (outerVertices.length/2)];
             var v3 = innerVertices[i];
@@ -22,6 +26,7 @@ var tunnlejs = (function () {
             triangles.push(simplelinearalgebra.createTriangle(v1,v2,v4));
             triangles.push(simplelinearalgebra.createTriangle(v3,v1,v4));
 
+            //Top closure
             var v1 = outerVertices[outerVertices.length/2+i];
             var v2 = outerVertices[outerVertices.length/2 + ((i+1) % (outerVertices.length/2))];
             var v3 = innerVertices[outerVertices.length/2+i];
@@ -97,15 +102,48 @@ var tunnlejs = (function () {
             outerSurface:outerSurface,
             innerSurface:innerSurface,
             resolution:resolution,
+            thickness:thickness,
             height:height,
             radius:radius
         };
         return createTunnle(config);
     }
 
+    var createTunnleByOuterSurface = function (surface, height,radius,thickness,resolution) {
+        var outerSurface = [];
+        var innerSurface = [];
+        for(var i = 0;i<surface.length;i++) {
+            outerSurface.push(surface[i])
+            innerSurface.push(surface[i])
+        }
 
+        var config = {
+            outerSurface:outerSurface,
+            innerSurface:innerSurface,
+            resolution:resolution,
+            height:height,
+            radius:radius,
+            thickness:thickness
+        };
+        return createTunnle(config);
+    }
+
+    var createTunnleByInnerAndOuterSurface = function (outerSurface, innerSurface, height,radius,thickness,resolution) {
+
+        var config = {
+            outerSurface:outerSurface,
+            innerSurface:innerSurface,
+            resolution:resolution,
+            height:height,
+            radius:radius,
+            thickness:thickness
+        };
+        return createTunnle(config);
+    }
 
     return {
-        createFlatTunnle
+        createFlatTunnle,
+        createTunnleByOuterSurface,
+        createTunnleByInnerAndOuterSurface
     };
 })();

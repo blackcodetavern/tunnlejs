@@ -19,8 +19,82 @@
 <body>
     <script>
         setTimeout(function () {
-            simple3dloader.init();
-            simple3dloader.setMesh(tunnlejs.createFlatTunnle(200,30,0.1,15,50));
+            function createExampleHTML(tunnle, title, description, canvas) {
+                var loader = new simple3dloader();
+                loader.init();
+                loader.setMesh(tunnle);
+
+                var exampleOuter = document.createElement("div");
+                exampleOuter.style.float = "left";
+                exampleOuter.style.width="500px";
+                exampleOuter.style.height="650px";
+                exampleOuter.style.margin="10px";
+
+                var exampleTitle = document.createElement("h3");
+                exampleTitle.innerHTML = title;
+
+                var exampleDescription = document.createElement("div");
+                exampleDescription.innerHTML = description;
+
+                var downloadButton = document.createElement('a');
+                downloadButton.setAttribute('href', 'data:application/octet-stream;charset=utf-8,' + encodeURIComponent(tunnle));
+                downloadButton.setAttribute('download', title+".stl");
+                downloadButton.innerHTML = title+" (STL)";
+
+                exampleOuter.appendChild(exampleTitle);
+                exampleOuter.appendChild(loader.getCanvas());
+                exampleOuter.appendChild(exampleDescription);
+                exampleOuter.appendChild(downloadButton);
+
+
+                document.body.appendChild(exampleOuter);
+            }
+
+            
+            createExampleHTML(
+                tunnlejs.createFlatTunnle(200,30,0.1,15,3),
+                "Flat tunnle",
+                "This tunnle has a wallthickness of 10% and 15 side segments and 3 height segments"
+            )
+
+            createExampleHTML(
+                tunnlejs.createFlatTunnle(200,30,0.1,4,3),
+                "Box tunnle",
+                "This tunnle is shaped like a box"
+            )
+
+            createExampleHTML(
+                tunnlejs.createFlatTunnle(100,50,1,4,3),
+                "Box",
+                "This tunnle is a box"
+            )
+
+            createExampleHTML(
+                tunnlejs.createTunnleByOuterSurface([1,0.7,1,0.7,1,0.7,1,0.7,1,0.7,1,0.7,1,0.7,1,0.7],200,30,0.1,15),
+                "Alternating surface",
+                "This tunnle has an alternating inner and outer surface"
+            )
+
+            createExampleHTML(
+                tunnlejs.createTunnleByInnerAndOuterSurface([2,2,0.5,0.5,0.5,0.5,0.5,0.5,2,2],[0,2,0.5,0.5,0.5,0.5,0.5,0.5,2,0],200,30,0.1,15),
+                "Dumbbell",
+                "This tunnle has the Form of a dumbbell"
+            )
+
+            createExampleHTML(
+                tunnlejs.createTunnleByInnerAndOuterSurface([1.7,1.9,2,2,2,2,2,2,2],[0,0,1,2,2,2,2,2,2.1],200,30,0.1,15),
+                "Cup",
+                "This tunnle has the Form of a cup"
+            )
+
+            createExampleHTML(
+                tunnlejs.createTunnleByInnerAndOuterSurface(
+                    [1,1,1,1,1,1,1,1.5,1.1,1,1,0.7,0.7,0.7,0.7,1.2,0.7,0.5,0.4,0.4,0.4,0.4,0.7,0.4,0.4,0.4,0.3,0.2,0.2,0.5,0.1,0],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.5,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.3,0.1,0.1,0.05,0.1,0],180,50,0.3,4),
+                "Asian Tower",
+                "This tunnle has the Form of a tower"
+            )
+
         },100);
     </script>
 </body>
