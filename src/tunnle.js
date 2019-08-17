@@ -1,18 +1,40 @@
 var tunnlejs = (function () {
 
-    var createTunnle = function (config) {
+    var createTunnleBySurface = function (config) {
         //Outer and inner wall of the tunnle
-        var outer = createWall(config.outerSurface, config.height, config.radius, config.resolution, -1)
-        var inner = createWall(config.innerSurface, config.height, config.radius*(1-config.thickness), config.resolution, 1)
 
-        //Top and bottom closure (Will be extended in a future release)
-        var closure = createClosure(outer.closureVertices, inner.closureVertices);
-        
-        //Concat the triangles of the tunnle
-        var obj = simplelinearalgebra.createObject(outer.triangles.concat(inner.triangles).concat(closure));
+        var surfaceWallFunction = function (surface, radius, height, horizontalSteps) {
+            return function (i, h) {
+                var x = surface[h] * radius*Math.sin(2 * Math.PI / horizontalSteps * i);
+                var y = height*h/surface.length;
+                var z = surface[h] * radius*Math.cos(2 * Math.PI / horizontalSteps * i);
+                return {x,y,z};
+            }
+        };
 
-        //Generate the STL from the triangles
-        return simplestl.getFullTextSTL(obj);
+
+        var outer = createWallByFunction(surfaceWallFunction(config.outerSurface,config.radius,config.height,config.resolution),config.resolution, config.outerSurface.length, -1)
+        var inner = createWallByFunction(surfaceWallFunction(config.innerSurface,config.radius*(1-config.thickness),config.height,config.resolution), config.resolution, config.innerSurface.length, 1)
+        return createTunnle(outer, inner);
+    }
+
+    var createTunnleByWallFunctions = function (config) {
+        //Outer and inner wall of the tunnle
+        var outer = createWallByFunction(config.outerWallFunction, config.height, config.radius, config.resolution, -1)
+        var inner = createWallByFunction(config.innerWallFunction, config.height, config.radius*(1-config.thickness), config.resolution, 1)
+
+        return createTunnle(outer, inner);
+    }
+
+    var createTunnle = function (outerSurface, innerSurface) {
+            //Top and bottom closure (Will be extended in a future release)
+            var closure = createClosure(outerSurface.closureVertices, innerSurface.closureVertices);
+    
+            //Concat the triangles of the tunnle
+            var obj = simplelinearalgebra.createObject(outerSurface.triangles.concat(innerSurface.triangles).concat(closure));
+    
+            //Generate the STL from the triangles
+            return simplestl.getFullTextSTL(obj);
     }
 
     var createClosure = function (outerVertices, innerVertices) {
@@ -38,55 +60,38 @@ var tunnlejs = (function () {
         return triangles;
     }
 
-    var createWall = function (surface, height, radius, resolution, direction) {
+    var createWallByFunction = function (wallFunction, resolutionHorizontal, resolutionVertical, direction) {
         var triangles = [];
         var closureVertices = [];
-        for(var h=0;h<surface.length-1;h++){
-            for(var i = 1;i<=resolution;i++) {
+        for(var h=0;h<resolutionVertical-1;h++){
+            for(var i = 1;i<=resolutionHorizontal;i++) {
                 
-                var v1 = simplelinearalgebra.createVertex(
-                    surface[h] * radius*Math.sin(getCircleArgument(resolution, i)),
-                    height*h/surface.length,
-                    surface[h] * radius*Math.cos(getCircleArgument(resolution, i))
-                );
+                var vertices = [];
+                for(var p = 0;p<2;p++){
+                    for(var q=0;q<2;q++){
+                        var groundVector = wallFunction(i+p,h+q);
+                        vertices.push(simplelinearalgebra.createVertex(
+                            groundVector.x,
+                            groundVector.y,
+                            groundVector.z
+                        ))
+                    }
+                }
 
-                var v2 = simplelinearalgebra.createVertex(
-                    surface[h] * radius*Math.sin(getCircleArgument(resolution, i+1)),
-                    height*h/surface.length,
-                    surface[h] * radius*Math.cos(getCircleArgument(resolution, i+1))
-                ); 
-
-                var v3 = simplelinearalgebra.createVertex(
-                    surface[h+1] * radius*Math.sin(getCircleArgument(resolution, i+1)),
-                    height*(h+1)/surface.length,
-                    surface[h+1] * radius*Math.cos(getCircleArgument(resolution, i+1))
-                ); 
-                
-                var v4 = simplelinearalgebra.createVertex(
-                    surface[h+1] * radius*Math.sin(getCircleArgument(resolution, i)),
-                    height*(h+1)/surface.length,
-                    surface[h+1] * radius*Math.cos(getCircleArgument(resolution, i))
-                ); 
-
-
-                if(h==0) closureVertices.push(v1);
-                else if(h==surface.length-2) closureVertices.push(v4);
+                if(h==0) closureVertices.push(vertices[0]);
+                else if(h==resolutionVertical-2) closureVertices.push(vertices[3]);
                 
                 
                 if(direction < 0) {
-                    triangles.push(simplelinearalgebra.createTriangle(v1,v3,v2));
-                    triangles.push(simplelinearalgebra.createTriangle(v3,v1,v4));
+                    triangles.push(simplelinearalgebra.createTriangle(vertices[0],vertices[1],vertices[2]));
+                    triangles.push(simplelinearalgebra.createTriangle(vertices[1],vertices[3],vertices[2]));
                 } else {
-                    triangles.push(simplelinearalgebra.createTriangle(v1,v2,v3));
-                    triangles.push(simplelinearalgebra.createTriangle(v3,v4,v1));
+                    triangles.push(simplelinearalgebra.createTriangle(vertices[0],vertices[2],vertices[1]));
+                    triangles.push(simplelinearalgebra.createTriangle(vertices[1],vertices[2],vertices[3]));
                 }
             }
         }
-        return {triangles, closureVertices};
-    }
-
-    var getCircleArgument = function(resolution, step) {
-        return 2 * Math.PI / resolution * step;
+        return {triangles, closureVertices};        
     }
 
 
@@ -106,7 +111,7 @@ var tunnlejs = (function () {
             height:height,
             radius:radius
         };
-        return createTunnle(config);
+        return createTunnleBySurface(config);
     }
 
     var createTunnleByOuterSurface = function (surface, height,radius,thickness,resolution) {
@@ -125,7 +130,7 @@ var tunnlejs = (function () {
             radius:radius,
             thickness:thickness
         };
-        return createTunnle(config);
+        return createTunnleBySurface(config);
     }
 
     var createTunnleByInnerAndOuterSurface = function (outerSurface, innerSurface, height,radius,thickness,resolution) {
@@ -138,7 +143,7 @@ var tunnlejs = (function () {
             radius:radius,
             thickness:thickness
         };
-        return createTunnle(config);
+        return createTunnleBySurface(config);
     }
 
     return {
