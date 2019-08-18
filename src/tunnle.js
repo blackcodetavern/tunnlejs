@@ -5,9 +5,9 @@ var tunnlejs = (function () {
 
         var surfaceWallFunction = function (surface, radius, height, horizontalSteps) {
             return function (i, h) {
-                var x = surface[h] * radius*Math.sin(2 * Math.PI / horizontalSteps * i);
+                var x = surface[h] * radius*Math.sin(2 * Math.PI / (horizontalSteps-1) * i);
                 var y = height*h/surface.length;
-                var z = surface[h] * radius*Math.cos(2 * Math.PI / horizontalSteps * i);
+                var z = surface[h] * radius*Math.cos(2 * Math.PI / (horizontalSteps-1) * i);
                 return {x,y,z};
             }
         };
@@ -18,13 +18,14 @@ var tunnlejs = (function () {
         return createTunnle(outer, inner);
     }
 
-    var createTunnleByWallFunctions = function (config) {
+    var createTunnleByWallFunctions = function (outerWallFunction, innerWallFunction, horizontalResolution, verticalResolution) {
         //Outer and inner wall of the tunnle
-        var outer = createWallByFunction(config.outerWallFunction, config.height, config.radius, config.resolution, -1)
-        var inner = createWallByFunction(config.innerWallFunction, config.height, config.radius*(1-config.thickness), config.resolution, 1)
-
+        var outer = createWallByFunction(outerWallFunction,horizontalResolution, verticalResolution, -1)
+        var inner = createWallByFunction(innerWallFunction,horizontalResolution, verticalResolution, 1)
         return createTunnle(outer, inner);
     }
+
+
 
     var createTunnle = function (outerSurface, innerSurface) {
             //Top and bottom closure (Will be extended in a future release)
@@ -39,22 +40,15 @@ var tunnlejs = (function () {
 
     var createClosure = function (outerVertices, innerVertices) {
         var triangles = [];        
-        for(var i = 0;i<outerVertices.length/2;i++) {
+        for(var i = 0;i<outerVertices.length;i++) {
             //Bottom closure
             var v1 = outerVertices[i];
-            var v2 = outerVertices[(i+1) % (outerVertices.length/2)];
+            var v2 = outerVertices[(i+1) % (outerVertices.length)];
             var v3 = innerVertices[i];
-            var v4 = innerVertices[(i+1) % (outerVertices.length/2)];
+            var v4 = innerVertices[(i+1) % (innerVertices.length)];
             triangles.push(simplelinearalgebra.createTriangle(v1,v2,v4));
             triangles.push(simplelinearalgebra.createTriangle(v3,v1,v4));
 
-            //Top closure
-            var v1 = outerVertices[outerVertices.length/2+i];
-            var v2 = outerVertices[outerVertices.length/2 + ((i+1) % (outerVertices.length/2))];
-            var v3 = innerVertices[outerVertices.length/2+i];
-            var v4 = innerVertices[outerVertices.length/2 + ((i+1) % (outerVertices.length/2))];
-            triangles.push(simplelinearalgebra.createTriangle(v1,v4,v2));
-            triangles.push(simplelinearalgebra.createTriangle(v3,v4,v1));
 
         }
         return triangles;
@@ -63,8 +57,11 @@ var tunnlejs = (function () {
     var createWallByFunction = function (wallFunction, resolutionHorizontal, resolutionVertical, direction) {
         var triangles = [];
         var closureVertices = [];
+
+        var closure= {left:[],right:[],top:[],bottom:[]};
+
         for(var h=0;h<resolutionVertical-1;h++){
-            for(var i = 1;i<=resolutionHorizontal;i++) {
+            for(var i = 0;i<resolutionHorizontal-1;i++) {
                 
                 var vertices = [];
                 for(var p = 0;p<2;p++){
@@ -78,8 +75,11 @@ var tunnlejs = (function () {
                     }
                 }
 
-                if(h==0) closureVertices.push(vertices[0]);
-                else if(h==resolutionVertical-2) closureVertices.push(vertices[3]);
+                if(i==0) closure.left.unshift(vertices[0]);
+                if(h==0) closure.bottom.push(vertices[2]);
+                if(i==resolutionHorizontal-2) closure.right.push(vertices[3]);
+                if(h==resolutionVertical-2) closure.top.unshift(vertices[1]);
+
                 
                 
                 if(direction < 0) {
@@ -91,6 +91,7 @@ var tunnlejs = (function () {
                 }
             }
         }
+        closureVertices = closure.bottom.concat(closure.right).concat(closure.top).concat(closure.left);
         return {triangles, closureVertices};        
     }
 
@@ -106,7 +107,7 @@ var tunnlejs = (function () {
         var config = {
             outerSurface:outerSurface,
             innerSurface:innerSurface,
-            resolution:resolution,
+            resolution:resolution+1,
             thickness:thickness,
             height:height,
             radius:radius
@@ -125,7 +126,7 @@ var tunnlejs = (function () {
         var config = {
             outerSurface:outerSurface,
             innerSurface:innerSurface,
-            resolution:resolution,
+            resolution:resolution+1,
             height:height,
             radius:radius,
             thickness:thickness
@@ -138,7 +139,7 @@ var tunnlejs = (function () {
         var config = {
             outerSurface:outerSurface,
             innerSurface:innerSurface,
-            resolution:resolution,
+            resolution:resolution+1,
             height:height,
             radius:radius,
             thickness:thickness
@@ -149,6 +150,7 @@ var tunnlejs = (function () {
     return {
         createFlatTunnle,
         createTunnleByOuterSurface,
-        createTunnleByInnerAndOuterSurface
+        createTunnleByInnerAndOuterSurface,
+        createTunnleByWallFunctions
     };
 })();

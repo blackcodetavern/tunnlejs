@@ -23,7 +23,7 @@
                 var loader = new simple3dloader();
                 loader.init();
                 loader.setMesh(tunnle);
-
+ 
                 var exampleOuter = document.createElement("div");
                 exampleOuter.style.float = "left";
                 exampleOuter.style.width="500px";
@@ -49,6 +49,26 @@
 
                 document.body.appendChild(exampleOuter);
             }
+
+
+            var surfaceWallFunction = function ( radius, height, horizontalSteps, verticalSteps) {
+                return function (i, h) {
+                    var x = ((0.9+0.05*Math.sin((8*Math.PI*h/100)))*90 + (((h%5)==0||(i%5)==0)?5:0))*Math.cos(2*Math.PI/(horizontalSteps-1)*(i));
+                    var y = h*2;
+                    var z = ((0.9+0.05*Math.sin((8*Math.PI*h/100)))*90 + (((h%5)==0||(i%5)==0)?5:0))*Math.sin(2*Math.PI/(verticalSteps-1)*(i));
+                    return {x,y,z};
+                }
+            };
+
+
+            var surfaceWallFunction2 = function ( radius, height, horizontalSteps, verticalSteps) {
+                return function (i, h) {
+                    var x = (100 - (((h%5)==0||(i%5)==0)?5:0))*Math.cos(2*Math.PI/(horizontalSteps-1)*i);
+                    var y = h*2;
+                    var z = (100 - (((h%5)==0||(i%5)==0)?5:0))*Math.sin(2*Math.PI/(verticalSteps-1)*i);
+                    return {x,y,z};
+                }
+            };
 
             
             createExampleHTML(
@@ -84,15 +104,29 @@
             createExampleHTML(
                 tunnlejs.createTunnleByInnerAndOuterSurface([1.7,1.9,2,2,2,2,2,2,2],[0,0,1,2,2,2,2,2,2.1],200,30,0.1,15),
                 "Cup",
-                "This tunnle has the Form of a cup"
+                "This+30*Math.sin(5*h/100) tunnle has the Form of a cup"
             )
-
+            
+            var ar1 =[1,1,1,1,1,1,1,1.5,1.1,1,1,0.7,0.7,0.7,0.7,1.2,0.7,0.5,0.4,0.4,0.4,0.4,0.7,0.4,0.4,0.4,0.3,0.2,0.2,0.5,0.1,0];
+            var ar2 =[1,1,1,1,1,1,1,1.5,1.1,1,1,0.7,0.7,0.7,0.7,1.2,0.7,0.5,0.4,0.4,0.4,0.4,0.7,0.4,0.4,0.4,0.3,0.2,0.2,0.5,0.1,0];
             createExampleHTML(
                 tunnlejs.createTunnleByInnerAndOuterSurface(
-                    [1,1,1,1,1,1,1,1.5,1.1,1,1,0.7,0.7,0.7,0.7,1.2,0.7,0.5,0.4,0.4,0.4,0.4,0.7,0.4,0.4,0.4,0.3,0.2,0.2,0.5,0.1,0],
-                    [1,1,1,1,1,1,1,1,1,1,1,1,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.5,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.3,0.1,0.1,0.05,0.1,0],180,50,0.3,4),
+                    ar1,
+                    ar2,180,50,0.3,4),
                 "Asian Tower",
                 "This tunnle has the Form of a tower"
+            )
+
+
+
+            var innerWallFunction = surfaceWallFunction(100,100,100,100)
+            var outerWallFunction = surfaceWallFunction2(100,100,100,100)
+
+
+            createExampleHTML(
+                tunnlejs.createTunnleByWallFunctions(innerWallFunction, outerWallFunction,100,100),
+                "Function generated tunnle",
+                "This tunnle is generated with one inner and one outerwall function"
             )
 
         },100);
