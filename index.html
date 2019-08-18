@@ -53,9 +53,9 @@
 
             var surfaceWallFunction = function ( radius, height, horizontalSteps, verticalSteps) {
                 return function (i, h) {
-                    var x = ((0.9+0.05*Math.sin((8*Math.PI*h/100)))*90 + (((h%5)==0||(i%5)==0)?5:0))*Math.cos(2*Math.PI/(horizontalSteps-1)*(i));
+                    var x = ((0.9+0.05*Math.sin((8*Math.PI*h/height)))*radius + (((h%5)==0||(i%5)==0)?5:0))*Math.cos(2*Math.PI/(horizontalSteps-1)*(i));
                     var y = h*2;
-                    var z = ((0.9+0.05*Math.sin((8*Math.PI*h/100)))*90 + (((h%5)==0||(i%5)==0)?5:0))*Math.sin(2*Math.PI/(verticalSteps-1)*(i));
+                    var z = ((0.9+0.05*Math.sin((8*Math.PI*h/height)))*radius + (((h%5)==0||(i%5)==0)?5:0))*Math.sin(2*Math.PI/(verticalSteps-1)*(i));
                     return {x,y,z};
                 }
             };
@@ -63,13 +63,26 @@
 
             var surfaceWallFunction2 = function ( radius, height, horizontalSteps, verticalSteps) {
                 return function (i, h) {
-                    var x = (100 - (((h%5)==0||(i%5)==0)?5:0))*Math.cos(2*Math.PI/(horizontalSteps-1)*i);
+                    var x = (radius - (((h%5)==0||(i%5)==0)?5:0))*Math.cos(2*Math.PI/(horizontalSteps-1)*i);
                     var y = h*2;
-                    var z = (100 - (((h%5)==0||(i%5)==0)?5:0))*Math.sin(2*Math.PI/(verticalSteps-1)*i);
+                    var z = (radius - (((h%5)==0||(i%5)==0)?5:0))*Math.sin(2*Math.PI/(verticalSteps-1)*i);
                     return {x,y,z};
                 }
             };
 
+
+
+            var innerWallFunction = surfaceWallFunction(80,100,100,100)
+            var outerWallFunction = surfaceWallFunction2(100,100,100,100)
+            
+            var holes = [{top:100-2,left:0,bottom:0,right:100-2},{top:50,left:10,bottom:10,right:50}]
+
+
+            createExampleHTML(
+                tunnlejs.createTunnleByWallFunctions(holes,innerWallFunction, outerWallFunction,100,100),
+                "Function generated tunnle",
+                "This tunnle is generated with one inner and one outerwall function"
+            )
             
             createExampleHTML(
                 tunnlejs.createFlatTunnle(200,30,0.1,15,3),
@@ -116,18 +129,8 @@
                 "Asian Tower",
                 "This tunnle has the Form of a tower"
             )
+            
 
-
-
-            var innerWallFunction = surfaceWallFunction(100,100,100,100)
-            var outerWallFunction = surfaceWallFunction2(100,100,100,100)
-
-
-            createExampleHTML(
-                tunnlejs.createTunnleByWallFunctions(innerWallFunction, outerWallFunction,100,100),
-                "Function generated tunnle",
-                "This tunnle is generated with one inner and one outerwall function"
-            )
 
         },100);
     </script>
