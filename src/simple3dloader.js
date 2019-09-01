@@ -18,7 +18,7 @@ function simple3dloader() {
 
         scene.add( camera );
 
-        var grid = new THREE.GridHelper( 10, 50, 0xff0000, 0x555555 );
+        var grid = new THREE.GridHelper( 5, 50, 0xff0000, 0x555555 );
         grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
         scene.add( grid );
 

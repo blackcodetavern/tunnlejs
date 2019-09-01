@@ -8,130 +8,112 @@
 <script src="lib/stlviewer/three.js"></script>
 <script src="lib/stlviewer/STLLoader.js"></script>
 <script src="lib/stlviewer/OrbitControls.js"></script>
+<script src="lib/vue.min.js"></script>
 
+
+<script src="src/helper/htmlHelper.js"></script>
 <script src="src/simplestl.js"></script>
 <script src="src/simplelinearalgebra.js"></script>
 <script src="src/tunnle.js"></script>
 <script src="src/simple3dloader.js"></script>
 
+<style>
+    body {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size:12px;
+    }
+    .inputOuter {
+        width:600px;
+    }
+    .label {
+        width:20%;
+        padding:2px;
+        display:inline-block;
+    }
+
+    .labelWide {
+        width:90%;
+        padding:2px;
+        display:inline-block;
+    }
+
+    .group {
+        padding:10px;
+    }
+
+    .inputSmall {
+        width:20%;
+    }
+
+    input, select {
+        width:70%;
+        padding:2px;
+        display:inline-block;
+    }
+
+</style>
+
 </head>
 
 <body>
+    <div id="editor" style="float:left;">
+        <div class="group">
+            <div class="inputOuter"><div class="label">Example: </div>
+                <select v-model="selectedExample">
+                    <option v-for="option in examples" v-bind:value="option.id">
+                      {{option.name}}
+                    </option>
+                  </select>
+            </div>
+            
+        </div>
+        <div class="group">
+            <div class="inputOuter"><div class="labelWide">//Horizontal / Vertical steps</div></div>
+            <div class="inputOuter"><div class="label">horizontalSteps = </div><input v-model="horizontalSteps"/></div>
+            <div class="inputOuter"><div class="label">verticalSteps = </div><input v-model="verticalSteps"/></div>
+        </div>
+
+        <div class="group">
+            <div class="inputOuter"><div class="labelWide">//"i" is an iterator from 0 to horizontalSteps</div></div>
+            <div class="inputOuter"><div class="labelWide">//"h" is an iterator from 0 to verticalSteps</div></div>
+            <div class="inputOuter"><div class="labelWide">innerWallVertexAt(i, h) {</div></div>
+            <div class="inputOuter"><div class="label">x = </div><input v-model="innerWallDefinition.x"/></div>
+            <div class="inputOuter"><div class="label">y = </div><input v-model="innerWallDefinition.y"/></div>
+            <div class="inputOuter"><div class="label">z = </div><input v-model="innerWallDefinition.z"/></div>
+            <div class="inputOuter"><div class="labelWide">return {x, y, z};</div></div>
+            <div class="inputOuter"><div class="inputWide">}</div></div>
+        </div>
+        
+        <div class="group">
+            <div class="inputOuter"><div class="labelWide">outerWallVertexAt(i, h) {</div></div>
+            <div class="inputOuter"><div class="label">x = </div><input v-model="outerWallDefinition.x"/></div>
+            <div class="inputOuter"><div class="label">y = </div><input v-model="outerWallDefinition.y"/></div>
+            <div class="inputOuter"><div class="label">z = </div><input v-model="outerWallDefinition.z"/></div>
+            <div class="inputOuter"><div class="labelWide">return {x, y, z};</div></div>
+            <div class="inputOuter"><div class="inputWide">}</div></div>
+        </div>
+
+        <div class="group">
+            <div class="inputOuter"><div class="labelWide">Holes</div></div>
+            <div class="inputOuter" v-for="hole in otherHoles">
+                <div class="label">bottom=</div><input class="inputSmall" v-model="hole.bottom"/>
+                <div class="label">top=</div><input  class="inputSmall" v-model="hole.top"/>
+                <div class="label">left=</div><input class="inputSmall" v-model="hole.left"/>
+                <div class="label">right=</div><input class="inputSmall" v-model="hole.right"/>
+                <button @click="deleteHole">Delete</button>
+            </div>
+        </div>
+
+        <button @click="addHole">Add hole</button>
+
+        <button @click="updateExample">Update</button>
+    </div>
+    <div id="example" style="float:left;">
+
+    </div>
     <script>
         setTimeout(function () {
-            function createExampleHTML(tunnle, title, description, canvas) {
-                var loader = new simple3dloader();
-                loader.init();
-                loader.setMesh(tunnle);
- 
-                var exampleOuter = document.createElement("div");
-                exampleOuter.style.float = "left";
-                exampleOuter.style.width="500px";
-                exampleOuter.style.height="650px";
-                exampleOuter.style.margin="10px";
-
-                var exampleTitle = document.createElement("h3");
-                exampleTitle.innerHTML = title;
-
-                var exampleDescription = document.createElement("div");
-                exampleDescription.innerHTML = description;
-
-                var downloadButton = document.createElement('a');
-                downloadButton.setAttribute('href', 'data:application/octet-stream;charset=utf-8,' + encodeURIComponent(tunnle));
-                downloadButton.setAttribute('download', title+".stl");
-                downloadButton.innerHTML = title+" (STL)";
-
-                exampleOuter.appendChild(exampleTitle);
-                exampleOuter.appendChild(loader.getCanvas());
-                exampleOuter.appendChild(exampleDescription);
-                exampleOuter.appendChild(downloadButton);
-
-
-                document.body.appendChild(exampleOuter);
-            }
-
-
-            var surfaceWallFunction = function ( radius, height, horizontalSteps, verticalSteps) {
-                return function (i, h) {
-                    var x = ((0.9+0.05*Math.sin((8*Math.PI*h/height)))*radius + (((h%5)==0||(i%5)==0)?5:0))*Math.cos(2*Math.PI/(horizontalSteps-1)*(i));
-                    var y = h*2;
-                    var z = ((0.9+0.05*Math.sin((8*Math.PI*h/height)))*radius + (((h%5)==0||(i%5)==0)?5:0))*Math.sin(2*Math.PI/(verticalSteps-1)*(i));
-                    return {x,y,z};
-                }
-            };
-
-
-            var surfaceWallFunction2 = function ( radius, height, horizontalSteps, verticalSteps) {
-                return function (i, h) {
-                    var x = (radius - (((h%5)==0||(i%5)==0)?5:0))*Math.cos(2*Math.PI/(horizontalSteps-1)*i);
-                    var y = h*2;
-                    var z = (radius - (((h%5)==0||(i%5)==0)?5:0))*Math.sin(2*Math.PI/(verticalSteps-1)*i);
-                    return {x,y,z};
-                }
-            };
-
-
-
-            var innerWallFunction = surfaceWallFunction(80,100,100,100)
-            var outerWallFunction = surfaceWallFunction2(100,100,100,100)
-            
-            var holes = [{top:100-2,left:0,bottom:0,right:100-2},{top:50,left:10,bottom:10,right:50}]
-
-
-            createExampleHTML(
-                tunnlejs.createTunnleByWallFunctions(holes,innerWallFunction, outerWallFunction,100,100),
-                "Function generated tunnle",
-                "This tunnle is generated with one inner and one outerwall function"
-            )
-            
-            createExampleHTML(
-                tunnlejs.createFlatTunnle(200,30,0.1,15,3),
-                "Flat tunnle",
-                "This tunnle has a wallthickness of 10% and 15 side segments and 3 height segments"
-            )
-
-            createExampleHTML(
-                tunnlejs.createFlatTunnle(200,30,0.1,4,3),
-                "Box tunnle",
-                "This tunnle is shaped like a box"
-            )
-
-            createExampleHTML(
-                tunnlejs.createFlatTunnle(100,50,1,4,3),
-                "Box",
-                "This tunnle is a box"
-            )
-
-            createExampleHTML(
-                tunnlejs.createTunnleByOuterSurface([1,0.7,1,0.7,1,0.7,1,0.7,1,0.7,1,0.7,1,0.7,1,0.7],200,30,0.1,15),
-                "Alternating surface",
-                "This tunnle has an alternating inner and outer surface"
-            )
-
-            createExampleHTML(
-                tunnlejs.createTunnleByInnerAndOuterSurface([2,2,0.5,0.5,0.5,0.5,0.5,0.5,2,2],[0,2,0.5,0.5,0.5,0.5,0.5,0.5,2,0],200,30,0.1,15),
-                "Dumbbell",
-                "This tunnle has the Form of a dumbbell"
-            )
-
-            createExampleHTML(
-                tunnlejs.createTunnleByInnerAndOuterSurface([1.7,1.9,2,2,2,2,2,2,2],[0,0,1,2,2,2,2,2,2.1],200,30,0.1,15),
-                "Cup",
-                "This+30*Math.sin(5*h/100) tunnle has the Form of a cup"
-            )
-            
-            var ar1 =[1,1,1,1,1,1,1,1.5,1.1,1,1,0.7,0.7,0.7,0.7,1.2,0.7,0.5,0.4,0.4,0.4,0.4,0.7,0.4,0.4,0.4,0.3,0.2,0.2,0.5,0.1,0];
-            var ar2 =[1,1,1,1,1,1,1,1.5,1.1,1,1,0.7,0.7,0.7,0.7,1.2,0.7,0.5,0.4,0.4,0.4,0.4,0.7,0.4,0.4,0.4,0.3,0.2,0.2,0.5,0.1,0];
-            createExampleHTML(
-                tunnlejs.createTunnleByInnerAndOuterSurface(
-                    ar1,
-                    ar2,180,50,0.3,4),
-                "Asian Tower",
-                "This tunnle has the Form of a tower"
-            )
-            
-
-
+            createEditorHTML();
         },100);
     </script>
 </body>
