@@ -27,6 +27,15 @@ function createEditorHTML() {
                     outerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps-1))*30", y:"h*3", z:"cos(2*i*PI/(horizontalSteps-1))*30"},
                     horizontalSteps: 30,
                     verticalSteps:30
+                },
+                {
+                    name: "Pet feeder",
+                    id:3,
+                    innerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps-1))*20", y:"h*2",z:"cos(2*i*PI/(horizontalSteps-1))*20" },
+                    outerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps-1))*30", y:"h*4", z:"cos(2*i*PI/(horizontalSteps-1))*30"},
+                    horizontalSteps: 30,
+                    verticalSteps:30,
+                    otherHoles:[{bottom:2,top:10,left:10,right:25}]
                 }
             ],
             innerWallDefinition: {x:"i*2.5", y:"(((i%10)<8&&(i%10)>=2)&& ((h%10)>=2&&(h%10)<8))?2:22",z:"h*2.5" },
