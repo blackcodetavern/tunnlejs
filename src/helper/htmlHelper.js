@@ -36,6 +36,15 @@ function createEditorHTML() {
                     horizontalSteps: 30,
                     verticalSteps:30,
                     otherHoles:[{bottom:2,top:10,left:10,right:25}]
+                },
+                {
+                    name: "Herringbone-Gear",
+                    id:4,
+                    innerWallDefinition: {x:"(i%4<=1?8:10)*cos(2*i*PI/(horizontalSteps-1)+(h<(verticalSteps/2)?h:(verticalSteps-1-h))/(2*PI))", y:"h+(h>=5?-1:0)",z:"(i%4<=1?8:10)*sin(2*i*PI/(horizontalSteps-1)+(h<(verticalSteps/2)?h:(verticalSteps-1-h))/(2*PI))" },
+                    outerWallDefinition: {x:"2*cos(2*i*PI/(horizontalSteps-1))", y:"h+(h>=5?-1:0)", z:"2*sin(2*i*PI/(horizontalSteps-1))"},
+                    horizontalSteps: 100,
+                    verticalSteps:10,
+                    otherHoles:[]
                 }
             ],
             innerWallDefinition: {x:"i*2.5", y:"(((i%10)<8&&(i%10)>=2)&& ((h%10)>=2&&(h%10)<8))?2:22",z:"h*2.5" },
