@@ -40,9 +40,13 @@ function createEditorHTML() {
                 {
                     name: "Herringbone-Gear",
                     id:4,
-                    innerWallDefinition: {x:"(i%4<=1?8:10)*cos(2*i*PI/(horizontalSteps-1)+(h<(verticalSteps/2)?h:(verticalSteps-1-h))/(2*PI))", y:"h+(h>=5?-1:0)",z:"(i%4<=1?8:10)*sin(2*i*PI/(horizontalSteps-1)+(h<(verticalSteps/2)?h:(verticalSteps-1-h))/(2*PI))" },
+                    innerWallDefinition: {
+                        x:"(i%5<=2?8:10)*cos(2*i*PI/(horizontalSteps-1)+(h<(verticalSteps/2)?h:(verticalSteps-1-h))/(2*PI))", 
+                        y:"h+(h>=5?-1:0)",
+                        z:"(i%5<=2?8:10)*sin(2*i*PI/(horizontalSteps-1)+(h<(verticalSteps/2)?h:(verticalSteps-1-h))/(2*PI))" 
+                    },
                     outerWallDefinition: {x:"2*cos(2*i*PI/(horizontalSteps-1))", y:"h+(h>=5?-1:0)", z:"2*sin(2*i*PI/(horizontalSteps-1))"},
-                    horizontalSteps: 100,
+                    horizontalSteps: 101,
                     verticalSteps:10,
                     otherHoles:[]
                 }
