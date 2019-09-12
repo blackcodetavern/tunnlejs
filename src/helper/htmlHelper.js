@@ -23,16 +23,16 @@ function createEditorHTML() {
                 {
                     name: "Roll",
                     id:2,
-                    innerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps-1))*20", y:"h*3",z:"cos(2*i*PI/(horizontalSteps-1))*20" },
-                    outerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps-1))*30", y:"h*3", z:"cos(2*i*PI/(horizontalSteps-1))*30"},
+                    innerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps))*20", y:"h*3",z:"cos(2*i*PI/(horizontalSteps))*20" },
+                    outerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps))*30", y:"h*3", z:"cos(2*i*PI/(horizontalSteps))*30"},
                     horizontalSteps: 30,
                     verticalSteps:30
                 },
                 {
                     name: "Pet feeder",
                     id:3,
-                    innerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps-1))*20", y:"h*2",z:"cos(2*i*PI/(horizontalSteps-1))*20" },
-                    outerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps-1))*30", y:"h*4", z:"cos(2*i*PI/(horizontalSteps-1))*30"},
+                    innerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps))*20", y:"h*2",z:"cos(2*i*PI/(horizontalSteps))*20" },
+                    outerWallDefinition: {x:"sin(2*i*PI/(horizontalSteps))*30", y:"h*4", z:"cos(2*i*PI/(horizontalSteps))*30"},
                     horizontalSteps: 30,
                     verticalSteps:30,
                     otherHoles:[{bottom:2,top:10,left:10,right:25}]
@@ -41,12 +41,16 @@ function createEditorHTML() {
                     name: "Herringbone-Gear",
                     id:4,
                     innerWallDefinition: {
-                        x:"(i%5<=2?8:10)*cos(2*i*PI/(horizontalSteps-1)+(h<(verticalSteps/2)?h:(verticalSteps-1-h))/(2*PI))", 
-                        y:"h+(h>=5?-1:0)",
-                        z:"(i%5<=2?8:10)*sin(2*i*PI/(horizontalSteps-1)+(h<(verticalSteps/2)?h:(verticalSteps-1-h))/(2*PI))" 
+                        x:"(i%5<=2?8:10)*cos(2*i*PI/(horizontalSteps)+(h<(verticalSteps/2)?h:(verticalSteps-h))/(2*PI))", 
+                        y:"h",
+                        z:"(i%5<=2?8:10)*sin(2*i*PI/(horizontalSteps)+(h<(verticalSteps/2)?h:(verticalSteps-h))/(2*PI))" 
                     },
-                    outerWallDefinition: {x:"2*cos(2*i*PI/(horizontalSteps-1))", y:"h+(h>=5?-1:0)", z:"2*sin(2*i*PI/(horizontalSteps-1))"},
-                    horizontalSteps: 101,
+                    outerWallDefinition: {
+                        x:"7*cos(2*i*PI/(horizontalSteps)+(h<(verticalSteps/2)?h:(verticalSteps-h))/(2*PI))", 
+                        y:"h",
+                        z:"7*sin(2*i*PI/(horizontalSteps)+(h<(verticalSteps/2)?h:(verticalSteps-h))/(2*PI))" 
+                    },
+                    horizontalSteps: 100,
                     verticalSteps:10,
                     otherHoles:[]
                 }
@@ -76,7 +80,7 @@ function createEditorHTML() {
             },
             updateExample: function () {
                 createExampleHTML(
-                    tunnlejs.createTunnleByWallFunctions(this.holes,this.outerWallFunction, this.innerWallFunction,this.horizontalSteps,this.verticalSteps),
+                    tunnlejs.createTunnleByWallFunctions(this.holes,this.outerWallFunction, this.innerWallFunction,this.horizontalSteps,this.verticalSteps,true),
                     "Function generated model",
                     "This model is generated with one inner and one outerwall function"
                 )
@@ -111,7 +115,7 @@ function createEditorHTML() {
                 return this.getSurfaceWallFunction(this.outerWallDefinition, this.horizontalSteps, this.verticalSteps)
             },
             holes() {
-                return [{top:this.verticalSteps-2,left:0,bottom:0,right:this.horizontalSteps-2}].concat(this.otherHoles);
+                return [{top:this.verticalSteps-1,left:0,bottom:0,right:this.horizontalSteps-1}].concat(this.otherHoles);
             }
         },
         mounted() {

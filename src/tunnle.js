@@ -12,17 +12,17 @@ var tunnlejs = (function () {
             }
         };
 
-        var outer = createWallByFunction([{top:config.outerSurface.length-2,left:0,bottom:0,right:config.resolution-2}], surfaceWallFunction(config.outerSurface,config.radius,config.height,config.resolution),config.resolution, config.outerSurface.length, -1)
-        var inner = createWallByFunction([{top:config.outerSurface.length-2,left:0,bottom:0,right:config.resolution-2}], surfaceWallFunction(config.innerSurface,config.radius*(1-config.thickness),config.height,config.resolution), config.resolution, config.innerSurface.length, 1)
+        var outer = createWallByFunction([{top:config.outerSurface.length-1,left:0,bottom:0,right:config.resolution-1}], surfaceWallFunction(config.outerSurface,config.radius,config.height,config.resolution),config.resolution, config.outerSurface.length, -1)
+        var inner = createWallByFunction([{top:config.outerSurface.length-1,left:0,bottom:0,right:config.resolution-1}], surfaceWallFunction(config.innerSurface,config.radius*(1-config.thickness),config.height,config.resolution), config.resolution, config.innerSurface.length, 1)
         return createTunnle(outer, inner);
     }
 
-    var createTunnleByWallFunctions = function (holes, outerWallFunction, innerWallFunction, horizontalResolution, verticalResolution) {
+    var createTunnleByWallFunctions = function (holes, outerWallFunction, innerWallFunction, horizontalResolution, verticalResolution, closed) {
         //Outer and inner wall of the tunnle
         var outerHoles = JSON.parse(JSON.stringify(holes));
         var innerHoles = JSON.parse(JSON.stringify(holes));
-        var outer = createWallByFunction(outerHoles,outerWallFunction,horizontalResolution, verticalResolution, -1)
-        var inner = createWallByFunction(innerHoles,innerWallFunction,horizontalResolution, verticalResolution, 1)
+        var outer = createWallByFunction(outerHoles,outerWallFunction,horizontalResolution, verticalResolution, -1, closed)
+        var inner = createWallByFunction(innerHoles,innerWallFunction,horizontalResolution, verticalResolution, 1, closed)
         return createTunnle(outer, inner);
     }
 
@@ -62,19 +62,21 @@ var tunnlejs = (function () {
         return triangles;
     }
     //hole: {top:0,left:0,bottom:resolutionVertical-1,right:resolutionHorizontal-1}
-    var createWallByFunction = function (holes, wallFunction, resolutionHorizontal, resolutionVertical, direction) {
+    var createWallByFunction = function (holes, wallFunction, resolutionHorizontal, resolutionVertical, direction, closed) {
         var triangles = [];
         var closureVertices = [];
 
         var closure= {left:[],right:[],top:[],bottom:[]};
-
-        for(var h=0;h<resolutionVertical-1;h++){
-            for(var i = 0;i<resolutionHorizontal-1;i++) {
+        
+        for(var h=0;h<resolutionVertical;h++){
+            for(var i = 0;i<resolutionHorizontal;i++) {
                 
                 var vertices = [];
                 for(var p = 0;p<2;p++){
                     for(var q=0;q<2;q++){
-                        var groundVector = wallFunction(i+p,h+q);
+                        var groundVector
+                        if(!closed) groundVector = wallFunction(i+p,h+q);
+                        else groundVector = wallFunction(i+p,h+q);
                         vertices.push(simplelinearalgebra.createVertex(
                             groundVector.x,
                             groundVector.y,
